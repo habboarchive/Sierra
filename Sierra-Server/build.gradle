@@ -1,0 +1,61 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+java {
+    sourceCompatibility = JavaVersion.toVersion("1.17")
+    targetCompatibility = JavaVersion.toVersion("1.17")
+}
+
+mainClassName = 'org.alexdev.Sierra.Sierra'
+
+repositories {
+    maven { url 'https://jitpack.io' }
+    mavenCentral()
+}
+
+dependencies {
+    // https://mvnrepository.com/artifact/com.jolbox/bonecp
+    implementation group: 'com.jolbox', name: 'bonecp', version: '0.7.1.RELEASE'
+
+    // https://mvnrepository.com/artifact/com.google.guava/guava
+    implementation group: 'com.google.guava', name: 'guava', version: '11.0.2'
+
+    // https://mvnrepository.com/artifact/mysql/mysql-connector-java
+    implementation group: 'mysql', name: 'mysql-connector-java', version: '5.1.6'
+
+    // https://mvnrepository.com/artifact/io.netty/netty
+    implementation group: 'io.netty', name: 'netty', version: '3.5.10.Final'
+
+    // https://mvnrepository.com/artifact/org.slf4j/slf4j-api
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.2'
+
+    // https://mvnrepository.com/artifact/org.slf4j/slf4j-simple
+    implementation group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.2'
+}
+
+// Create fat jar with libraries inside of it.
+task fatJar(type: Jar) {
+    zip64 true
+    duplicatesStrategy 'exclude'
+    manifest {
+        attributes 'Main-Class': mainClassName
+    }
+    baseName = project.name + '-all'
+    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
+// Create jar with no libraries inside of it, used when creating with "gradle distZip" and
+// libraries are then to be stored in the folder next to it called 'dependency-jars'
+// https://vocon-it.com/2016/11/15/how-to-build-a-lean-jar-file-with-gradle/
+
+/*jar {
+    manifest {
+        attributes (
+                'Main-Class': mainClassName,
+                "Class-Path": '. dependency-jars/' + configurations.compile.collect {
+                    it.getName()
+                }.join(' dependency-jars/')
+        )
+    }
+}*/

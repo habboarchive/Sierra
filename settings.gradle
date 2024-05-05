@@ -1,0 +1,2 @@
+include 'Sierra-Server'
+project(":Sierra-Server").projectDir = file("Sierra-Server")
